@@ -113,6 +113,7 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
     }
 
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        //ContextRefreshedEvent Spring IOC类加载完成事件，此处逻辑判断这个事件是否是类加载完成事件
         if (isDelay() && !isExported() && !isUnexported()) {
             if (logger.isInfoEnabled()) {
                 logger.info("The service ready on spring started. service: " + getInterface());

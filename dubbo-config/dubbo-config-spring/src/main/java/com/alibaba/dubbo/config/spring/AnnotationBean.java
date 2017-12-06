@@ -193,6 +193,7 @@ public class AnnotationBean extends AbstractConfig implements DisposableBean, Be
         return bean;
     }
 
+    //Bean初始化完成之后调用，在此函数里面可进行一些自定义初始化操作
     public Object postProcessBeforeInitialization(Object bean, String beanName)
             throws BeansException {
         if (!isMatchPackage(bean)) {

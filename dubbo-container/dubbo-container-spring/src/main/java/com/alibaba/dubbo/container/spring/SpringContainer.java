@@ -38,6 +38,9 @@ public class SpringContainer implements Container {
         return context;
     }
 
+    /**
+     * 通过spring启动dubbo容器
+     */
     public void start() {
         String configPath = ConfigUtils.getProperty(SPRING_CONFIG);
         if (configPath == null || configPath.length() == 0) {

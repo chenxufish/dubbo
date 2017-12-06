@@ -29,6 +29,7 @@ import java.util.List;
  * @author william.liangf
  */
 @Adaptive
+//Adaptive注解在类上，代表人工实现编码，即实现了一个装饰类（设计模式中的装饰者模式）
 public class AdaptiveExtensionFactory implements ExtensionFactory {
 
     private final List<ExtensionFactory> factories;

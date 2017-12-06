@@ -46,6 +46,7 @@ public interface Protocol {
      * @throws RpcException 当暴露服务出错时抛出，比如端口已占用
      */
     @Adaptive
+    //注解在方法上，表示自动生成和编译一个动态的Adaptive类
     <T> Exporter<T> export(Invoker<T> invoker) throws RpcException;
 
     /**

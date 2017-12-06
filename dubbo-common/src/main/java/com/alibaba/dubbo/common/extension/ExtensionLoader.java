@@ -77,6 +77,7 @@ public class ExtensionLoader<T> {
 
     private final Class<?> type;
 
+    //ExtensionFactory为dubbo的IOC提供所有对象
     private final ExtensionFactory objectFactory;
 
     private final ConcurrentMap<Class<?>, String> cachedNames = new ConcurrentHashMap<Class<?>, String>();
@@ -104,6 +105,7 @@ public class ExtensionLoader<T> {
     }
 
     @SuppressWarnings("unchecked")
+    //获取Type接口的一个ExtensionLoader，用来加载SPI实现类
     public static <T> ExtensionLoader<T> getExtensionLoader(Class<T> type) {
         if (type == null)
             throw new IllegalArgumentException("Extension type == null");
@@ -293,6 +295,7 @@ public class ExtensionLoader<T> {
 
     /**
      * 返回指定名字的扩展。如果指定名字的扩展不存在，则抛异常 {@link IllegalStateException}.
+     * 获取指定SPI实现类的实例,get出来的对象是wrapper对象，例如ProtocolListenWrraper
      *
      * @param name
      * @return
@@ -491,6 +494,7 @@ public class ExtensionLoader<T> {
 
     @SuppressWarnings("unchecked")
     private T createExtension(String name) {
+        //从SPI的配置文件中读出文件生成class并缓存起来
         Class<?> clazz = getExtensionClasses().get(name);
         if (clazz == null) {
             throw findException(name);
@@ -515,6 +519,7 @@ public class ExtensionLoader<T> {
         }
     }
 
+    //IOC动态注入，Exetension为dubbo的IOC提供所有对象
     private T injectExtension(T instance) {
         try {
             if (objectFactory != null) {
@@ -553,6 +558,12 @@ public class ExtensionLoader<T> {
         return clazz;
     }
 
+
+    /**
+     * 在同步代码块中读取SPI配置文件中的类
+     * 并将读出的类缓存在cachedClasses文件中
+     * @return
+     */
     private Map<String, Class<?>> getExtensionClasses() {
         Map<String, Class<?>> classes = cachedClasses.get();
         if (classes == null) {
@@ -568,6 +579,13 @@ public class ExtensionLoader<T> {
     }
 
     // 此方法已经getExtensionClasses方法同步过。
+    /**
+     * 此类做了两件事情
+     * 一、有SPI注解的类读出value值并缓存在cachedDefaultName中
+     * 二、读出SPI配置文件中所有的类并实例化并存入对应的缓存文件中
+     * 三、返回读出来的Map，对于test=aaaaaa的格式，key为test，value为aaaa生成的class文件
+     * @return
+     */
     private Map<String, Class<?>> loadExtensionClasses() {
         final SPI defaultAnnotation = type.getAnnotation(SPI.class);
         if (defaultAnnotation != null) {
@@ -589,6 +607,17 @@ public class ExtensionLoader<T> {
         return extensionClasses;
     }
 
+    /**
+     * 加载配置文件中的类并缓存起来，缓存四种信息
+     * 一、有Adaptive注解的类缓存在cachedAdaptiveClass中（仅有一个这样的类）
+     * 二、有已接口为构造函数的类缓存在cachedWrapperClasses中（可以有多个这样的类）
+     * 三、有Activate注解的类，缓存key和对应的注解在cachedActivates中。
+     * 四、key为class，value为名字缓存在cachedNames中。例如key=aaa,缓存方式为{class<a>,key}
+     * 五、缓存非一、二、三这三种条件的类在传进来的extensionClasses中
+     *
+     * @param extensionClasses
+     * @param dir
+     */
     private void loadFile(Map<String, Class<?>> extensionClasses, String dir) {
         String fileName = dir + type.getName();
         try {
@@ -635,6 +664,7 @@ public class ExtensionLoader<T> {
                                                 }
                                             } else {
                                                 try {
+                                                    //如果读出来的类有以此接口为参数的构造函数则将这个类缓存在cachedWrapperClass中
                                                     clazz.getConstructor(type);
                                                     Set<Class<?>> wrappers = cachedWrapperClasses;
                                                     if (wrappers == null) {
@@ -643,6 +673,7 @@ public class ExtensionLoader<T> {
                                                     }
                                                     wrappers.add(clazz);
                                                 } catch (NoSuchMethodException e) {
+                                                    //如果读出来的类没有Adaptive注解也没有这样的构造函数
                                                     clazz.getConstructor();
                                                     if (name == null || name.length() == 0) {
                                                         name = findAnnotationName(clazz);
@@ -734,6 +765,11 @@ public class ExtensionLoader<T> {
         return compiler.compile(code, classLoader);
     }
 
+
+    /**
+     * 根据接口中注解了@Adaptive的方法生成一个类
+     * @return
+     */
     private String createAdaptiveExtensionClassCode() {
         StringBuilder codeBuidler = new StringBuilder();
         Method[] methods = type.getMethods();

@@ -106,6 +106,7 @@ public abstract class AbstractConfig implements Serializable {
         for (Method method : methods) {
             try {
                 String name = method.getName();
+                //找到对应的set方法，后面会调用set方法进行属性的初始化
                 if (name.length() > 3 && name.startsWith("set") && Modifier.isPublic(method.getModifiers())
                         && method.getParameterTypes().length == 1 && isPrimitive(method.getParameterTypes()[0])) {
                     String property = StringUtils.camelToSplitName(name.substring(3, 4).toLowerCase() + name.substring(4), ".");
@@ -120,6 +121,7 @@ public abstract class AbstractConfig implements Serializable {
                     }
                     if (value == null || value.length() == 0) {
                         String pn = prefix + property;
+                        //系统属性中找
                         value = System.getProperty(pn);
                         if (!StringUtils.isBlank(value)) {
                             logger.info("Use System Property " + pn + " to config dubbo");

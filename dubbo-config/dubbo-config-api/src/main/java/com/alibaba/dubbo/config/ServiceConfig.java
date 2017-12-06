@@ -226,6 +226,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         if (interfaceName == null || interfaceName.length() == 0) {
             throw new IllegalStateException("<dubbo:service interface=\"\" /> interface not allow null!");
         }
+        //provider属性的初始化
         checkDefault();
         if (provider != null) {
             if (application == null) {
@@ -682,6 +683,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         if (provider == null) {
             provider = new ProviderConfig();
         }
+        //provider中属性的初始化
         appendProperties(provider);
     }
 
