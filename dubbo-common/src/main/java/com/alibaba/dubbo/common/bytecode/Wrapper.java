@@ -104,6 +104,12 @@ public abstract class Wrapper {
         return ret;
     }
 
+
+    /**
+     * 包装了一个接口或者一个类，可以通过Wrapper对实例对象进行赋值、取值以及指定方法的调用
+     * @param c
+     * @return
+     */
     private static Wrapper makeWrapper(Class<?> c) {
         if (c.isPrimitive())
             throw new IllegalArgumentException("Can not create wrapper for primitive type: " + c);

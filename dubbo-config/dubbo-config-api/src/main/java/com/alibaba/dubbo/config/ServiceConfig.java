@@ -72,6 +72,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
 
     private static final Protocol protocol = ExtensionLoader.getExtensionLoader(Protocol.class).getAdaptiveExtension();
 
+    //就是为了获取一个接口的代理类，例如获取一个远程接口的代理
     private static final ProxyFactory proxyFactory = ExtensionLoader.getExtensionLoader(ProxyFactory.class).getAdaptiveExtension();
 
     private static final Map<String, Integer> RANDOM_PORT_MAP = new HashMap<String, Integer>();
@@ -353,6 +354,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void doExportUrls() {
         List<URL> registryURLs = loadRegistries(true);
+        //代表一个服务可以有多个通信协议，例如：tcp协议，http协议，默认是tcp协议
         for (ProtocolConfig protocolConfig : protocols) {
             doExportUrlsFor1Protocol(protocolConfig, registryURLs);
         }
@@ -482,9 +484,16 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
 
             //配置不是remote的情况下做本地暴露 (配置为remote，则表示只暴露远程服务)
             if (!Constants.SCOPE_REMOTE.toString().equalsIgnoreCase(scope)) {
+                /**
+                 * 地暴露是只暴露在一个JVM里面，不通过调用ZK来进行远程通信。
+                 * 例如：在同一个服务里面，自己调用自己的接口，没必要进行网络IP连接来通信
+                 */
                 exportLocal(url);
             }
-            //如果配置不是local则暴露为远程服务.(配置为local，则表示只暴露本地服务)
+            /**
+             * 如果配置不是local则暴露为远程服务.(配置为local，则表示只暴露本地服务)
+             * 指暴露给远程客户端的IP和端口号，通过网络来通信
+             */
             if (!Constants.SCOPE_LOCAL.toString().equalsIgnoreCase(scope)) {
                 if (logger.isInfoEnabled()) {
                     logger.info("Export dubbo service " + interfaceClass.getName() + " to url " + url);
@@ -501,7 +510,9 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                         }
                         Invoker<?> invoker = proxyFactory.getInvoker(ref, (Class) interfaceClass, registryURL.addParameterAndEncoded(Constants.EXPORT_KEY, url.toFullString()));
                         DelegateProviderMetaDataInvoker wrapperInvoker = new DelegateProviderMetaDataInvoker(invoker, this);
-
+                        /**
+                         * 远程暴露
+                         */
                         Exporter<?> exporter = protocol.export(wrapperInvoker);
                         exporters.add(exporter);
                     }

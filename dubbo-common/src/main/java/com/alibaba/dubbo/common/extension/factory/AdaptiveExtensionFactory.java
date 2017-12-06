@@ -34,6 +34,10 @@ public class AdaptiveExtensionFactory implements ExtensionFactory {
 
     private final List<ExtensionFactory> factories;
 
+
+    /**
+     * factories里面存的是ExtensionFactory实现类的实例，这个没有注入操作
+     */
     public AdaptiveExtensionFactory() {
         ExtensionLoader<ExtensionFactory> loader = ExtensionLoader.getExtensionLoader(ExtensionFactory.class);
         List<ExtensionFactory> list = new ArrayList<ExtensionFactory>();
@@ -43,6 +47,14 @@ public class AdaptiveExtensionFactory implements ExtensionFactory {
         factories = Collections.unmodifiableList(list);
     }
 
+
+    /**
+     *
+     * @param type object type. 加载的扩展类中set方法参数的class类
+     * @param name object name. 加载的扩展类中set的属性名
+     * @param <T>
+     * @return
+     */
     public <T> T getExtension(Class<T> type, String name) {
         for (ExtensionFactory factory : factories) {
             T extension = factory.getExtension(type, name);

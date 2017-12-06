@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * Invocation. (API, Prototype, NonThreadSafe)
- *
+ * 含了需要执行的方法和参数等信息
  * @author qian.lei
  * @author william.liangf
  * @serial Don't change the class name and package name.

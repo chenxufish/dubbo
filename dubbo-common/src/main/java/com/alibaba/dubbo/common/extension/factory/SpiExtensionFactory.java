@@ -26,6 +26,13 @@ import com.alibaba.dubbo.common.extension.SPI;
  */
 public class SpiExtensionFactory implements ExtensionFactory {
 
+    /**
+     *
+     * @param type object type. 对应类set方法的参数class类型
+     * @param name object name. 对应类set方法对应的属性名
+     * @param <T>
+     * @return
+     */
     public <T> T getExtension(Class<T> type, String name) {
         if (type.isInterface() && type.isAnnotationPresent(SPI.class)) {
             ExtensionLoader<T> loader = ExtensionLoader.getExtensionLoader(type);

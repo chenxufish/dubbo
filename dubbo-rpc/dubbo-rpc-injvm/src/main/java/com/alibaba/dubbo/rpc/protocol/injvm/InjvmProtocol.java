@@ -30,7 +30,7 @@ import java.util.Map;
 
 /**
  * InjvmProtocol
- *
+ * 本地暴露协议
  * @author qian.lei
  * @author william.liangf
  */
@@ -83,6 +83,9 @@ public class InjvmProtocol extends AbstractProtocol implements Protocol {
     }
 
     public <T> Exporter<T> export(Invoker<T> invoker) throws RpcException {
+        /**
+         * exporterMap用来存储InjvmExporter，Protocol接口的抽象类实现中
+         */
         return new InjvmExporter<T>(invoker, invoker.getUrl().getServiceKey(), exporterMap);
     }
 

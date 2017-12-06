@@ -32,6 +32,7 @@ import java.util.Collections;
 
 /**
  * ListenerProtocol
+ * 可以理解为Protocol的AOP
  *
  * @author william.liangf
  */
@@ -43,7 +44,7 @@ public class ProtocolListenerWrapper implements Protocol {
             Object serverInstance = serverGetInstanceMethod.invoke(null);
             Method startMethod = serverClass.getMethod("start");
             startMethod.invoke(serverInstance);
-        }catch (Throwable throwable){
+        } catch (Throwable throwable) {
 
         }
 
@@ -66,6 +67,7 @@ public class ProtocolListenerWrapper implements Protocol {
         if (Constants.REGISTRY_PROTOCOL.equals(invoker.getUrl().getProtocol())) {
             return protocol.export(invoker);
         }
+        //进入实际的Protocol实现类进行调用
         return new ListenerExporterWrapper<T>(protocol.export(invoker),
                 Collections.unmodifiableList(ExtensionLoader.getExtensionLoader(ExporterListener.class)
                         .getActivateExtension(invoker.getUrl(), Constants.EXPORTER_LISTENER_KEY)));

@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * ListenerProtocol
- *
+ * Wrapper可以理解为AOP
  * @author william.liangf
  */
 public class ProtocolFilterWrapper implements Protocol {
@@ -44,6 +44,15 @@ public class ProtocolFilterWrapper implements Protocol {
         this.protocol = protocol;
     }
 
+
+    /**
+     * 创建Filter进行过滤
+     * @param invoker
+     * @param key
+     * @param group
+     * @param <T>
+     * @return
+     */
     private static <T> Invoker<T> buildInvokerChain(final Invoker<T> invoker, String key, String group) {
         Invoker<T> last = invoker;
         List<Filter> filters = ExtensionLoader.getExtensionLoader(Filter.class).getActivateExtension(invoker.getUrl(), key, group);

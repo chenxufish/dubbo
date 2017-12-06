@@ -494,7 +494,7 @@ public class ExtensionLoader<T> {
 
     @SuppressWarnings("unchecked")
     private T createExtension(String name) {
-        //从SPI的配置文件中读出文件生成class并缓存起来
+        //从已加载的Map中读取对应的class
         Class<?> clazz = getExtensionClasses().get(name);
         if (clazz == null) {
             throw findException(name);
@@ -502,10 +502,13 @@ public class ExtensionLoader<T> {
         try {
             T instance = (T) EXTENSION_INSTANCES.get(clazz);
             if (instance == null) {
+                //实例化读出来的SPI实现类、实例化后缓存起来
                 EXTENSION_INSTANCES.putIfAbsent(clazz, (T) clazz.newInstance());
                 instance = (T) EXTENSION_INSTANCES.get(clazz);
             }
+            //为extension的instance注入相关依赖
             injectExtension(instance);
+            //如果有参数类型为对应接口的构造函数
             Set<Class<?>> wrapperClasses = cachedWrapperClasses;
             if (wrapperClasses != null && wrapperClasses.size() > 0) {
                 for (Class<?> wrapperClass : wrapperClasses) {
@@ -519,9 +522,20 @@ public class ExtensionLoader<T> {
         }
     }
 
+
+
     //IOC动态注入，Exetension为dubbo的IOC提供所有对象
+    /**
+     * 一、第一次加载的时候，对应接口的objectFactory是空的，所以在创建接口的ExtensionLoader的时候
+     * ObjectFactory是有@Adaptive注解的类的实现，不会走入if(objectFactory!=null)这个逻辑
+     * 二、如果已经创建了ExtensionLoader，那么objectFactory就是AdaptiveExtensionFactory，会走入if(objectFactory!=null)这个逻辑
+     *
+     * @param instance
+     * @return
+     */
     private T injectExtension(T instance) {
         try {
+            //加这个判断的目的是把ExtensionFactory bean的获取和普通bean的获取区分开
             if (objectFactory != null) {
                 for (Method method : instance.getClass().getMethods()) {
                     if (method.getName().startsWith("set")
@@ -562,6 +576,7 @@ public class ExtensionLoader<T> {
     /**
      * 在同步代码块中读取SPI配置文件中的类
      * 并将读出的类缓存在cachedClasses文件中
+     *
      * @return
      */
     private Map<String, Class<?>> getExtensionClasses() {
@@ -579,11 +594,13 @@ public class ExtensionLoader<T> {
     }
 
     // 此方法已经getExtensionClasses方法同步过。
+
     /**
      * 此类做了两件事情
      * 一、有SPI注解的类读出value值并缓存在cachedDefaultName中
      * 二、读出SPI配置文件中所有的类并实例化并存入对应的缓存文件中
      * 三、返回读出来的Map，对于test=aaaaaa的格式，key为test，value为aaaa生成的class文件
+     *
      * @return
      */
     private Map<String, Class<?>> loadExtensionClasses() {
@@ -750,7 +767,14 @@ public class ExtensionLoader<T> {
         }
     }
 
+    /**
+     * 如果扩展里面有@Adaptive注解的类则生成class直接返回
+     * 如果没有就根据接口里面有@Adaptive注解的方法生成一个这样的类
+     * @return
+     */
     private Class<?> getAdaptiveExtensionClass() {
+        //每一个ExtensionLoader都会对应一个ExtensionFactory，而ExtensionFactory就必须要有@Adaptive注解的实现类
+        //不然就会循环创建
         getExtensionClasses();
         if (cachedAdaptiveClass != null) {
             return cachedAdaptiveClass;
@@ -768,6 +792,7 @@ public class ExtensionLoader<T> {
 
     /**
      * 根据接口中注解了@Adaptive的方法生成一个类
+     *
      * @return
      */
     private String createAdaptiveExtensionClassCode() {
