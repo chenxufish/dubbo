@@ -215,6 +215,14 @@ public class DubboProtocol extends AbstractProtocol {
         return DEFAULT_PORT;
     }
 
+
+    /**
+     * 服务暴露的开始
+     * @param invoker 服务的执行体
+     * @param <T>
+     * @return
+     * @throws RpcException
+     */
     public <T> Exporter<T> export(Invoker<T> invoker) throws RpcException {
         URL url = invoker.getUrl();
 

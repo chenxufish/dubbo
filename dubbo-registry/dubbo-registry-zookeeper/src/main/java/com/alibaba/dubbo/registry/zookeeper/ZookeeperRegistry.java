@@ -67,6 +67,7 @@ public class ZookeeperRegistry extends FailbackRegistry {
         }
         this.root = group;
         zkClient = zookeeperTransporter.connect(url);
+        //监听、重连
         zkClient.addStateListener(new StateListener() {
             public void stateChanged(int state) {
                 if (state == RECONNECTED) {
@@ -127,6 +128,7 @@ public class ZookeeperRegistry extends FailbackRegistry {
                 String root = toRootPath();
                 ConcurrentMap<NotifyListener, ChildListener> listeners = zkListeners.get(url);
                 if (listeners == null) {
+                    //zkListeners监听集合
                     zkListeners.putIfAbsent(url, new ConcurrentHashMap<NotifyListener, ChildListener>());
                     listeners = zkListeners.get(url);
                 }

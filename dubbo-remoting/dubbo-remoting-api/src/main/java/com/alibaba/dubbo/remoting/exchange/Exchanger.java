@@ -25,6 +25,7 @@ import com.alibaba.dubbo.remoting.exchange.support.header.HeaderExchanger;
 /**
  * Exchanger. (SPI, Singleton, ThreadSafe)
  * <p>
+ * 信息交换层、封装请求响应，同步转异步等
  * <a href="http://en.wikipedia.org/wiki/Message_Exchange_Pattern">Message Exchange Pattern</a>
  * <a href="http://en.wikipedia.org/wiki/Request-response">Request-Response</a>
  *

@@ -87,6 +87,7 @@ public class ZkclientZookeeperClient extends AbstractZookeeperClient<IZkChildLis
 
     public IZkChildListener createTargetChildListener(String path, final ChildListener listener) {
         return new IZkChildListener() {
+            //收到订阅后的处理
             public void handleChildChange(String parentPath, List<String> currentChilds)
                     throws Exception {
                 listener.childChanged(parentPath, currentChilds);

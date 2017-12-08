@@ -193,6 +193,9 @@ public abstract class AbstractRegistry implements Registry {
         }
     }
 
+    /**
+     * 目的：把不同接口对应的注册中心的地址加载出来
+     */
     private void loadProperties() {
         if (file != null && file.exists()) {
             InputStream in = null;

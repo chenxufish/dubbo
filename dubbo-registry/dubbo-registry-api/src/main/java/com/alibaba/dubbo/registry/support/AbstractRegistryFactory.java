@@ -80,6 +80,12 @@ public abstract class AbstractRegistryFactory implements RegistryFactory {
         }
     }
 
+
+    /**
+     * 创建一个注册中心
+     * @param url 注册中心地址，不允许为空
+     * @return
+     */
     public Registry getRegistry(URL url) {
         url = url.setPath(RegistryService.class.getName())
                 .addParameter(Constants.INTERFACE_KEY, RegistryService.class.getName())

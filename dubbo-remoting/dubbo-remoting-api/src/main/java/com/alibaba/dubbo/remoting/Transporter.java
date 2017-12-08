@@ -25,6 +25,8 @@ import javax.sound.midi.Receiver;
 /**
  * Transporter. (SPI, Singleton, ThreadSafe)
  * <p>
+ *
+ * 网络传输层，用来抽象netty,mina的接口
  * <a href="http://en.wikipedia.org/wiki/Transport_Layer">Transport Layer</a>
  * <a href="http://en.wikipedia.org/wiki/Client%E2%80%93server_model">Client/Server</a>
  *

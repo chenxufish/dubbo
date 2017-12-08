@@ -17,7 +17,7 @@ package com.alibaba.dubbo.rpc;
 
 /**
  * Exporter. (API/SPI, Prototype, ThreadSafe)
- *
+ * 负责invoker的生命周期
  * @author william.liangf
  * @see com.alibaba.dubbo.rpc.Protocol#export(Invoker)
  * @see com.alibaba.dubbo.rpc.ExporterListener
